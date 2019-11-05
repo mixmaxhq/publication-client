@@ -14,4 +14,18 @@
 
 * 1.4.6 Prevent `Subscription#whenReady` from resolving prematurely after the websocket connects; implement `PublicationClient#whenConnected`
 
-See [the server changelog](https://github.com/mixmaxhq/publication-server/blob/master/README.md#server-changelog) for releases pre-1.4.6.
+* 1.4.5 `err._publicationName` -> `err.publicationName`
+
+* 1.4.4 Add the publication name to the error we emit on subscription errors.
+
+* 1.4.3 Delete subscription references when we unsubscribe from a publication.
+
+* 1.4.2 Fix typo with unsubscribe message.
+
+* 1.4.0 Handle custom event broadcasting (for shutdown message specifically).
+
+* 1.2.1 Enforce message ordering.
+
+* 1.1.0 Alter how we wrap the authentication function and make it required.
+
+* 1.0.0 Initial release
