@@ -3,9 +3,9 @@
 import _ from 'underscore';
 import EventEmitter from 'eventemitter3';
 
-import LocalCollection from './LocalCollection';
-import Primus from './Primus';
-import Subscription from './Subscription';
+import LocalCollection from './localCollection';
+import Primus from './primus';
+import Subscription from './subscription';
 import { Promise } from 'es6-promise';
 
 /**
