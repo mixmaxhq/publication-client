@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mixmaxhq/publication-server.git"
+    "url": "git+https://github.com/mixmaxhq/publication-client.git"
   },
   "author": "Trey Tacon <trey@mixmax.com> (https://mixmax.com)",
   "license": "MIT",
