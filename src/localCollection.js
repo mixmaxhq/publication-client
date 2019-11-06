@@ -1,10 +1,10 @@
 'use struct';
 
 import _ from 'underscore';
-import cloneDeep from 'lodash.cloneDeep';
+import cloneDeep from 'lodash.clonedeep';
 import EventEmitter from 'eventemitter3';
 
-import ReactiveQuery from './ReactiveQuery';
+import ReactiveQuery from './reactiveQuery';
 import { expandKeys, deepExtend } from './utils';
 
 /**
