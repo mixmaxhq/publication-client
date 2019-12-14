@@ -9,10 +9,12 @@
   ],
   "scripts": {
     "build": "[ \"$WATCH\" == 'true' ] && rollup -cw || rollup -c",
-    "watch": "WATCH=true npm run build",
+    "ci:commitlint": "commitlint-jenkins --pr-only",
     "prebuild": "rm -rf dist",
-    "prepublishOnly": "npm run build",
-    "test": "jest"
+    "prepublishOnly": "npm run build && if [ \"$CI\" = '' ]; then node -p 'JSON.parse(process.env.npm_package_config_manualPublishMessage)'; exit 1; fi",
+    "semantic-release": "semantic-release",
+    "test": "jest",
+    "watch": "WATCH=true npm run build"
   },
   "repository": {
     "type": "git",
@@ -30,13 +32,35 @@
     "@babel/core": "^7.7.5",
     "@babel/plugin-transform-modules-commonjs": "^7.7.5",
     "@babel/preset-env": "^7.7.6",
+    "@commitlint/config-conventional": "^8.3.3",
+    "@mixmaxhq/commitlint-jenkins": "^1.4.1",
     "@mixmaxhq/jest-coverage-config": "^2.0.1",
     "@mixmaxhq/jest-junit-config": "^1.0.0",
+    "@mixmaxhq/semantic-release-config": "^1.2.4",
+    "cz-conventional-changelog": "^3.0.2",
     "jest": "^24.9.0",
     "jest-junit": "^10.0.0",
     "rollup": "^0.41.4",
     "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-node-resolve": "^2.0.0",
+    "semantic-release": "^15.13.31",
     "underscore": "^1.9.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    },
+    "manualPublishMessage": "This repository is configured to use semantic-release for its releases. Please do not release manually.\n"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release": {
+    "extends": "@mixmaxhq/semantic-release-config"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
