@@ -14,6 +14,7 @@
     "prepublishOnly": "npm run build && if [ \"$CI\" = '' ]; then node -p 'JSON.parse(process.env.npm_package_config_manualPublishMessage)'; exit 1; fi",
     "semantic-release": "semantic-release",
     "test": "jest",
+    "ci": "npm run test",
     "watch": "WATCH=true npm run build"
   },
   "repository": {
