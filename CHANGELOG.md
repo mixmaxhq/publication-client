@@ -1,3 +1,12 @@
+## [2.1.0](https://github.com/mixmaxhq/publication-client/compare/v2.0.0...v2.1.0) (2019-12-14)
+
+
+### Bug Fixes
+
+* add ci script ([eaa18bd](https://github.com/mixmaxhq/publication-client/commit/eaa18bd5c91158fef4e793e072e7bf4b158d4609))
+* fix import cases for case-sensitive filesystems ([a219811](https://github.com/mixmaxhq/publication-client/commit/a219811d2c8af45328a4fb2740349a58bd4220d0))
+* ignore babelrc in build ([411662d](https://github.com/mixmaxhq/publication-client/commit/411662d8942289b9edd2591a9eef694ca3da91ca))
+
 ## Release History
 
 * 2.0.0 *Breaking* Upgrade primus to 7.3.3. This changes the `ping` and `pong` attributes when passing options to the primus client to one `pingTimeout` option.
