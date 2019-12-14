@@ -17,6 +17,7 @@ export default {
       }
     }),
     babel({
+      babelrc: false,
       exclude: ['node_modules/**']
     })
   ],
