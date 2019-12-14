@@ -11,8 +11,8 @@
     "build": "[ \"$WATCH\" == 'true' ] && rollup -cw || rollup -c",
     "watch": "WATCH=true npm run build",
     "prebuild": "rm -rf dist",
-    "prepublish": "npm run build",
-    "test": "jest ."
+    "prepublishOnly": "npm run build",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -33,7 +33,6 @@
     "@mixmaxhq/jest-coverage-config": "^2.0.1",
     "jest": "^24.9.0",
     "rollup": "^0.41.4",
-    "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-node-resolve": "^2.0.0",
     "underscore": "^1.9.1"

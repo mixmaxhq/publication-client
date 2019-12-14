@@ -3,5 +3,5 @@ module.exports = {
   testEnvironment: 'node',
   clearMocks: true,
   ...jestCoverageConfig,
-  collectCoverageFrom: ['**/src/**/*.js'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.js'],
 };
