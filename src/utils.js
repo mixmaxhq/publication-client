@@ -2,10 +2,18 @@
 
 import _ from 'underscore';
 
+
+function isSpecialSelector(selector, key) {
+  if (!_.isObject(selector)) return false;
+
+  var objKeys = _.keys(selector);
+  return objKeys.length === 1 && objKeys[0] === key;
+}
+
 /**
  * isMatch evaluates whether the give doc matches the given selector.
  * Copied from _.isMatch: https://github.com/jashkenas/underscore/blob/master/underscore.js#L1144
- * and modified to support `$elemMatch`.
+ * and modified to support a few mongo selectors: `$elemMatch`, `$ne`.
  * @param  {[type]} doc      [description]
  * @param  {[type]} selector [description]
  * @return {[type]}          [description]
@@ -23,22 +31,24 @@ function isMatch(doc, selector) {
     // recursively check the selector passed to `$elemMatch` against each
     // value in the corresponding array in the target object. If a single one
     // matches, continue on with the query matching/checking.
-    if (_.isObject(selector[key]) && _.isArray(obj[key])) {
-      var objKeys = _.keys(selector[key]);
-      if (objKeys.length === 1 && objKeys[0] === '$elemMatch') {
-        var arrayVals = obj[key];
-        var elemMatchQuery = selector[key].$elemMatch;
-        var foundMatch = false;
-        for (var j = 0; j < arrayVals.length; j++) {
-          if (isMatch(arrayVals[j], elemMatchQuery)) {
-            foundMatch = true;
-            break;
-          }
+    if (isSpecialSelector(selector[key], '$elemMatch') && _.isArray(obj[key])) {
+      var arrayVals = obj[key];
+      var elemMatchQuery = selector[key].$elemMatch;
+      var foundMatch = false;
+      for (var j = 0; j < arrayVals.length; j++) {
+        if (isMatch(arrayVals[j], elemMatchQuery)) {
+          foundMatch = true;
+          break;
         }
-        if (!foundMatch) return false;
-        // We found a match, so continue on.
-        continue;
       }
+      if (!foundMatch) return false;
+      // We found a match, so continue on.
+      continue;
+    }
+
+    if (isSpecialSelector(selector[keys], '$ne')) {
+      if (selector[key].$ne === obj[key]) return false;
+      continue;
     }
     if (selector[key] !== obj[key] || !(key in obj)) return false;
   }
