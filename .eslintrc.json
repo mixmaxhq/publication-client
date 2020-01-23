@@ -1,3 +1,16 @@
 {
-    "extends": "mixmax/browser"
+  "extends": ["mixmax/browser", "mixmax/prettier"],
+  "overrides": [
+    {
+      "files": ["rollup.config.js"],
+      "extends": "mixmax/node"
+    },
+    {
+      "files": ["jest.config.js"],
+      "extends": "mixmax/node",
+      "parserOptions": {
+        "sourceType": "script"
+      }
+    }
+  ]
 }
