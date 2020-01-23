@@ -45,9 +45,12 @@ class PublicationClient extends EventEmitter {
     this._collections = {};
     this._isConnected = false;
 
-    this._client = new Primus(url, _.defaults(options, {
-      strategy: ['online', 'disconnect']
-    }));
+    this._client = new Primus(
+      url,
+      _.defaults(options, {
+        strategy: ['online', 'disconnect'],
+      })
+    );
 
     this._client.on('data', (message) => {
       this._handleMessage(message);
@@ -132,8 +135,8 @@ class PublicationClient extends EventEmitter {
    */
   _connect() {
     this._client.write({
-      msg:'connect',
-      version: '1'
+      msg: 'connect',
+      version: '1',
     });
   }
 
@@ -168,7 +171,11 @@ class PublicationClient extends EventEmitter {
     var subscription = this._subscriptions[subscriptionKey];
     if (!subscription) {
       subscription = this._subscriptions[subscriptionKey] = new Subscription(
-        String(id), name, params, this);
+        String(id),
+        name,
+        params,
+        this
+      );
     }
     return subscription;
   }

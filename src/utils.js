@@ -2,7 +2,6 @@
 
 import _ from 'underscore';
 
-
 function isSpecialSelector(selector, key) {
   if (!_.isObject(selector)) return false;
 
@@ -68,23 +67,27 @@ function expandKeys(object) {
   });
   if (!hasFlattenedKeys) return object;
 
-  return _.reduce(object, function(payload, value, key) {
-    var path = key.split('.');
-    if (path.length === 1) {
-      var obj = {};
-      obj[key] = value;
-      payload = deepExtend(payload, obj);
+  return _.reduce(
+    object,
+    function(payload, value, key) {
+      var path = key.split('.');
+      if (path.length === 1) {
+        var obj = {};
+        obj[key] = value;
+        payload = deepExtend(payload, obj);
+        return payload;
+      }
+      var subKey = path.pop();
+      var localObj = payload;
+      while (path.length) {
+        var subPath = path.shift();
+        localObj = localObj[subPath] = localObj[subPath] || {};
+      }
+      localObj[subKey] = object[key];
       return payload;
-    }
-    var subKey = path.pop();
-    var localObj = payload;
-    while (path.length) {
-      var subPath = path.shift();
-      localObj = localObj[subPath] = localObj[subPath] || {};
-    }
-    localObj[subKey] = object[key];
-    return payload;
-  }, {});
+    },
+    {}
+  );
 }
 
 /**
@@ -119,8 +122,4 @@ function isObject(obj) {
   return _.isObject(obj) && !_.isArray(obj);
 }
 
-export {
-  deepExtend,
-  expandKeys,
-  isMatch
-};
+export { deepExtend, expandKeys, isMatch };

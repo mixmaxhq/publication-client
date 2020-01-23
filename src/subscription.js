@@ -86,7 +86,7 @@ class Subscription extends EventEmitter {
       msg: 'sub',
       id: this._id,
       name: this._name,
-      params: this._params
+      params: this._params,
     });
     this._connection.on('ready', this._boundOnReady);
     this._connection.on('nosub', this._boundOnNoSub);
@@ -109,10 +109,9 @@ class Subscription extends EventEmitter {
 
     this._connection._send({
       msg: 'unsub',
-      id: this._id
+      id: this._id,
     });
-    this._connection._removeSubscription(
-      JSON.stringify([this._name].concat(this._params)));
+    this._connection._removeSubscription(JSON.stringify([this._name].concat(this._params)));
   }
 
   /**
