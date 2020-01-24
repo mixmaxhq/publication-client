@@ -4,7 +4,6 @@ import _ from 'underscore';
 import EventEmitter from 'eventemitter3';
 import { isMatch } from './utils';
 
-
 /**
  * Creates a reactive query which will emit 'added', 'changed', and 'removed'
  * events with the same semantics as Meteor's

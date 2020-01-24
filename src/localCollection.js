@@ -30,9 +30,9 @@ class LocalCollection extends EventEmitter {
    *    ID).
    */
   _onAdded(id, fields) {
-    var doc = this._docs[id] = _.extend({}, fields, {
-      _id: id
-    });
+    var doc = (this._docs[id] = _.extend({}, fields, {
+      _id: id,
+    }));
 
     // Make sure that we emit a cloned copy, so that no consumer holds a direct
     // reference to the underlying document.

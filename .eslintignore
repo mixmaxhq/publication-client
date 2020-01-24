@@ -1,0 +1,4 @@
+/dist
+
+# This is a dependency masquerading as a normal source file.
+/src/primus.js

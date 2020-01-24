@@ -12,14 +12,14 @@ export default {
     commonjs({
       include: ['node_modules/**'],
       namedExports: {
-        'es6-promise': ['Promise']
-      }
-    })
+        'es6-promise': ['Promise'],
+      },
+    }),
   ],
   targets: [
     {
       format: 'es',
-      dest: pkg['main']
-    }
-  ]
+      dest: pkg['main'],
+    },
+  ],
 };
