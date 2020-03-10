@@ -1,3 +1,10 @@
+## [2.2.0](https://github.com/mixmaxhq/publication-client/compare/v2.1.0...v2.2.0) (2020-03-10)
+
+
+### Features
+
+* **localcollection:** allow supressing removal warnings ([be76564](https://github.com/mixmaxhq/publication-client/commit/be765644d0ceea89d114dd9933a545581b05f1de))
+
 ## [2.1.0](https://github.com/mixmaxhq/publication-client/compare/v2.0.0...v2.1.0) (2019-12-14)
 
 
