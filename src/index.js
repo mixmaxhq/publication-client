@@ -145,12 +145,17 @@ class PublicationClient extends EventEmitter {
    * one is created and then returned.
    *
    * @param {String} name The name of the collection to return.
+   * @param      {Object} [opts] Options to set on the collection if it's created.
+   * @param      {bool}   [opts.supressRemovalWarnings]  If true, do not throw when we receive a
+   *   removed event and there is no corresponding document. This is useful for situations where
+   *   collections state is managed optimistically on the client rather than waiting for a server
+   *   response (e.g. calling model.destroy() from a backbone model).
    * @returns {LocalCollection} The collection to return.
    */
-  getCollection(name) {
+  getCollection(name, options = {}) {
     var collection = this._collections[name];
     if (!collection) {
-      collection = this._collections[name] = new LocalCollection(name, this);
+      collection = this._collections[name] = new LocalCollection(options);
     }
     return collection;
   }
