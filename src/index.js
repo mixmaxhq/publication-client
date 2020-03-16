@@ -144,8 +144,10 @@ class PublicationClient extends EventEmitter {
   /**
    * Checks whether we've received data in the timeout since the last data
    * timestamp. If not, proactively reconnect.
+   *
+   * @param {string} reason Why this reconnect request was triggered.
    */
-  reconnectIfIdle() {
+  reconnectIfIdle(reason) {
     if (!this._lastDataTimeout) return; // Only run if in paranoid mode.
     clearTimeout(this._idleTimer);
     // If we haven't received any data since the last time we checked,
@@ -154,6 +156,7 @@ class PublicationClient extends EventEmitter {
       this._client.end();
       this._client = this._initializeClient(this._url, this._options);
       this._resetCollectionsAndConnect();
+      this.emit('proactivelyReconnected', reason);
     }
 
     // While we primarily rely on explicit calls to the reconnectIfIdle
@@ -162,7 +165,7 @@ class PublicationClient extends EventEmitter {
     // connection.
     const boundReconnectFn = this.reconnectIfIdle.bind(this);
     this._idleTimer = setTimeout(() => {
-      boundReconnectFn();
+      boundReconnectFn('Idle timeout');
     }, this._lastDataTimeout * 3);
   }
 
