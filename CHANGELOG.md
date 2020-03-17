@@ -1,3 +1,16 @@
+## [2.3.0](https://github.com/mixmaxhq/publication-client/compare/v2.2.0...v2.3.0) (2020-03-17)
+
+
+### Features
+
+* add paranoid mode to monitor and reconnect ([0702b31](https://github.com/mixmaxhq/publication-client/commit/0702b31572ecd48f9ecf311bb704f8ecf69733d1))
+* emit event when proactively reconnected ([ca8c63c](https://github.com/mixmaxhq/publication-client/commit/ca8c63c2c77fd7e22171f2efe843bed9a84411b3))
+
+
+### Bug Fixes
+
+* temporarily disable reconnecting while we track stats ([e265d1c](https://github.com/mixmaxhq/publication-client/commit/e265d1c4170763d382770d70ae3a01d1fa09fb8e))
+
 ## [2.2.0](https://github.com/mixmaxhq/publication-client/compare/v2.1.0...v2.2.0) (2020-03-10)
 
 
