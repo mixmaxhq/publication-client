@@ -12,5 +12,10 @@
         "sourceType": "script"
       }
     }
-  ]
+  ],
+  "settings": {
+    "react": {
+      "version": "latest"
+    }
+  }
 }

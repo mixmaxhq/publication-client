@@ -40,26 +40,61 @@ class PublicationClient extends EventEmitter {
   constructor(url, options) {
     super();
 
+    this._url = url;
+    this._options = Object.assign({}, options);
     this._subscriptions = {};
     this._nextSubscriptionId = 0;
     this._collections = {};
     this._isConnected = false;
 
-    this._client = new Primus(
+    // If we're told to be paranoid about connection monitoring, we'll set up
+    // our parameters here.
+    if (options.paranoid) {
+      // The last time we saw any data come through this client. If it's been
+      // too long, we'll proactively reconnect to make sure we're not just
+      // leaving a dead connection sitting there.
+      this._lastDataTimestamp = Date.now();
+
+      // Default the timeout for the last time we received data to 120 seconds.
+      this._lastDataTimeout = options.lastDataTimeout || 120 * 1000;
+
+      // Delete paranoia options so we don't pass them on to Primus.
+      delete options.paranoid;
+      delete options.lastDataTimeout;
+    }
+
+    this._client = this._initializeClient(url, options);
+    this._connect();
+  }
+
+  /**
+   * Set up a new Primus client with all the necessary event listeners.
+   *
+   * @param {String} url The hostname of the publication provider as a URL.
+   *    The provided protocol must be one of `https` or `http` (which
+   *    correspond to the client using `wss` or `ws).
+   * @param {Object} options Configuration options, these are passed through to
+   *    Primus so see for all options, please see:
+   *    https://github.com/primus/primus#connecting-from-the-browser.
+   * @returns {Primus} The initialized Primus client object.
+   */
+  _initializeClient(url, options) {
+    const client = new Primus(
       url,
       _.defaults(options, {
         strategy: ['online', 'disconnect'],
       })
     );
 
-    this._client.on('data', (message) => {
+    client.on('data', (message) => {
+      this._updateLastDataTimestamp();
       this._handleMessage(message);
     });
-    this._connect();
 
     // When we reconnect, we need to mark ourselves as not connected, and we
     // also need to re-subscribe to all of our publications.
-    this._client.on('reconnected', () => {
+    client.on('reconnected', () => {
+      this._updateLastDataTimestamp();
       // Now that we're reconnected again, drop all local collections. We have
       // to do this because we don't know what updates we may have missed while
       // we've been disconnected (i.e. we could have missed `removed` events).
@@ -70,21 +105,69 @@ class PublicationClient extends EventEmitter {
       // every collection, we use an private method to tell the collections to
       // drop all documents - this means pre-existing ReactiveQueries aren't
       // left dangling.
-      _.invoke(this._collections, '_clear');
-
-      this._connect();
-      _.each(this._subscriptions, (sub) => {
-        sub._reset();
-        sub._start();
-      });
+      this._resetCollectionsAndConnect();
     });
 
     // This event is purely a way for Primus to tell us that it's going to try
     // to reconnect.
-    this._client.on('reconnect', () => {
+    client.on('reconnect', () => {
+      this._updateLastDataTimestamp();
       if (this._isConnected) this.emit('disconnected');
       this._isConnected = false;
     });
+
+    return client;
+  }
+
+  /**
+   * Refresh local collections, reconnect our websocket, and get our
+   * subscriptions up to date.
+   */
+  _resetCollectionsAndConnect() {
+    _.invoke(this._collections, '_clear');
+
+    this._connect();
+    _.each(this._subscriptions, (sub) => {
+      sub._reset();
+      sub._start();
+    });
+  }
+
+  /**
+   * Updates the timestamp of the last time we know we received data from the
+   * server.
+   */
+  _updateLastDataTimestamp() {
+    this._lastDataTimestamp = Date.now();
+  }
+
+  /**
+   * Checks whether we've received data in the timeout since the last data
+   * timestamp. If not, proactively reconnect.
+   *
+   * @param {string} reason Why this reconnect request was triggered.
+   */
+  reconnectIfIdle(reason) {
+    if (!this._lastDataTimeout) return; // Only run if in paranoid mode.
+    clearTimeout(this._idleTimer);
+    // If we haven't received any data since the last time we checked,
+    // force a reconnect.
+    if (Date.now() - this._lastDataTimestamp > this._lastDataTimeout) {
+      // TODO(ryanf): Temporarily disabled while we collect stats.
+      /*this._client.end();
+      this._client = this._initializeClient(this._url, this._options);
+      this._resetCollectionsAndConnect();*/
+      this.emit('proactivelyReconnected', reason);
+    }
+
+    // While we primarily rely on explicit calls to the reconnectIfIdle
+    // method to ensure we're checking, we'll also add a timer-based
+    // backup check so that a browser just sitting idle maintains its
+    // connection.
+    const boundReconnectFn = this.reconnectIfIdle.bind(this);
+    this._idleTimer = setTimeout(() => {
+      boundReconnectFn('Idle timeout');
+    }, this._lastDataTimeout * 3);
   }
 
   /**

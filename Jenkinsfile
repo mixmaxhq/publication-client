@@ -4,5 +4,5 @@
 @Library('scm-service-library') _
 
 npmModulePipeline {
-  coverageThreshold = '0.01'
+  coverageThreshold = '0.28'
 }
