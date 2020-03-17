@@ -153,9 +153,10 @@ class PublicationClient extends EventEmitter {
     // If we haven't received any data since the last time we checked,
     // force a reconnect.
     if (Date.now() - this._lastDataTimestamp > this._lastDataTimeout) {
-      this._client.end();
+      // TODO(ryanf): Temporarily disabled while we collect stats.
+      /*this._client.end();
       this._client = this._initializeClient(this._url, this._options);
-      this._resetCollectionsAndConnect();
+      this._resetCollectionsAndConnect();*/
       this.emit('proactivelyReconnected', reason);
     }
 
