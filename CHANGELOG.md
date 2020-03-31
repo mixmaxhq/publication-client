@@ -1,3 +1,10 @@
+## [2.4.0](https://github.com/mixmaxhq/publication-client/compare/v2.3.0...v2.4.0) (2020-03-31)
+
+
+### Features
+
+* enable reconnecting when paranoid mode is requested ([951aea9](https://github.com/mixmaxhq/publication-client/commit/951aea98f9b9a05f8e444d4273e7f2cf6db4c423))
+
 ## [2.3.0](https://github.com/mixmaxhq/publication-client/compare/v2.2.0...v2.3.0) (2020-03-17)
 
 
