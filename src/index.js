@@ -9,7 +9,7 @@ import Subscription from './subscription';
 import { Promise } from 'es6-promise';
 
 /**
- * Returns the initial title case of the string, for example:
+ * Return the initial title case of the string, for example:
  *
  *  - initialTitleCase('hello') === 'Hello'
  *  - initialTitleCase('hello there') === 'Hello there'
@@ -27,7 +27,7 @@ function initialTitleCase(str) {
  */
 class PublicationClient extends EventEmitter {
   /**
-   * Creates a PublicationClient that connects to the publication provider at
+   * Create a PublicationClient that connects to the publication provider at
    * the given url with the given options.
    *
    * @param {String} url The hostname of the publication provider as a URL.
@@ -130,11 +130,12 @@ class PublicationClient extends EventEmitter {
     _.each(this._subscriptions, (sub) => {
       sub._reset();
       sub._start();
+      sub.emit('reconnected');
     });
   }
 
   /**
-   * Updates the timestamp of the last time we know we received data from the
+   * Update the timestamp of the last time we know we received data from the
    * server.
    */
   _updateLastDataTimestamp() {
@@ -142,7 +143,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Checks whether we've received data in the timeout since the last data
+   * Check whether we've received data in the timeout since the last data
    * timestamp. If not, proactively reconnect.
    *
    * @param {string} reason Why this reconnect request was triggered.
@@ -170,7 +171,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Handles the given message if it is of a known message type.
+   * Handle the given message if it is of a known message type.
    * @param {Object} msg The message that we received from the publication
    *    provider.
    */
@@ -197,7 +198,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Returns a promise that will be resolved once the the publication provider
+   * Return a promise that will be resolved once the the publication provider
    * acknowledges to us that we are `connected`.
    *
    * @returns {Promise}
@@ -213,7 +214,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Tells the publication provider that we would like to connect.
+   * Tell the publication provider that we would like to connect.
    */
   _connect() {
     this._client.write({
@@ -223,8 +224,8 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Returns the collection with the given name. If no such collection exists,
-   * one is created and then returned.
+   * Return the collection with the given name. If no such collection exists,
+   * create one and return it.
    *
    * @param {String} name The name of the collection to return.
    * @param      {Object} [opts] Options to set on the collection if it's created.
@@ -243,7 +244,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Subscribes us to the publication with the given name, any other parameters
+   * Subscribe to the publication with the given name. Any other parameters
    * are passed as arguments to the publication.
    *
    * @param {String} name The publication to subscribe to.
@@ -268,7 +269,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Sends the given message to the publication provider.
+   * Send the given message to the publication provider.
    *
    * @param {Object} msg The message to send to the publication provider.
    */
@@ -277,7 +278,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Removes the subscription from the current session. This is called
+   * Remove the subscription from the current session. This is called
    * internally when a subscription is `stop()`ped.
    *
    * @param {String} subKey The subscription key that is unique to the
@@ -288,7 +289,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Adds the document with the given ID and fields to the given collection
+   * Add the document with the given ID and fields to the given collection
    * (all defined inside the message).
    *
    * @param {Object} message The message containing the document to add and the
@@ -304,7 +305,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Changes the document with the given ID in the given collection (all
+   * Change the document with the given ID in the given collection (all
    * defined inside the message).
    *
    * @param {Object} message The message containing the document to change and
@@ -321,7 +322,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Removes the document with the given ID from the given collection (all
+   * Remove the document with the given ID from the given collection (all
    * defined inside the message).
    *
    * @param {Object} message The message containing the document to remove and
@@ -336,7 +337,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Returns true if the client is currently connected to the server, false if
+   * Return true if the client is currently connected to the server, false if
    * it is not.
    *
    * @returns {Boolean} Whether the client is connected to the server or not.
@@ -346,7 +347,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Allows the user to close the connection.
+   * Allow the user to close the connection.
    */
   stop() {
     this._client.end();
