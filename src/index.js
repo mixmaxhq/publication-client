@@ -130,6 +130,7 @@ class PublicationClient extends EventEmitter {
     _.each(this._subscriptions, (sub) => {
       sub._reset();
       sub._start();
+      sub.emit('reconnected');
     });
   }
 
