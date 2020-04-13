@@ -1,3 +1,10 @@
+### [2.4.1](https://github.com/mixmaxhq/publication-client/compare/v2.4.0...v2.4.1) (2020-04-13)
+
+
+### Bug Fixes
+
+* emit reconnected event on _resetCollectionsAndConnect ([1df914c](https://github.com/mixmaxhq/publication-client/commit/1df914cade667c03eb300a02d6c96e3aa31a0d8c))
+
 ## [2.4.0](https://github.com/mixmaxhq/publication-client/compare/v2.3.0...v2.4.0) (2020-03-31)
 
 
