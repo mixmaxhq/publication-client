@@ -1,3 +1,10 @@
+### [2.4.2](https://github.com/mixmaxhq/publication-client/compare/v2.4.1...v2.4.2) (2020-10-06)
+
+
+### Bug Fixes
+
+* make reconnection less aggressive ([0ac50de](https://github.com/mixmaxhq/publication-client/commit/0ac50de51de47dd74db52382d4077c72a736a889))
+
 ### [2.4.1](https://github.com/mixmaxhq/publication-client/compare/v2.4.0...v2.4.1) (2020-04-13)
 
 
