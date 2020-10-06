@@ -83,6 +83,12 @@ class PublicationClient extends EventEmitter {
       url,
       _.defaults(options, {
         strategy: ['online', 'disconnect'],
+        reconnect: {
+          min: 1000,
+          max: Infinity,
+          retries: 10,
+          factor: 2,
+        },
       })
     );
 
