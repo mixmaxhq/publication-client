@@ -1,3 +1,10 @@
+## [2.5.0](https://github.com/mixmaxhq/publication-client/compare/v2.4.2...v2.5.0) (2021-01-15)
+
+
+### Features
+
+* add updated primus client code for primus 8 upgrades ([5a1e101](https://github.com/mixmaxhq/publication-client/commit/5a1e10192ff7b68b2950b2718bf075f4985ff51a))
+
 ### [2.4.2](https://github.com/mixmaxhq/publication-client/compare/v2.4.1...v2.4.2) (2020-10-06)
 
 
