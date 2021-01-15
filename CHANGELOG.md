@@ -1,3 +1,19 @@
+## [3.0.0](https://github.com/mixmaxhq/publication-client/compare/v2.5.0...v3.0.0) (2021-01-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* we now require a publication-server version
+of version 2 or higher.
+* require publication-client@>v2
+
+### Features
+
+* add req on publication-server version ([eef6fbd](https://github.com/mixmaxhq/publication-client/commit/eef6fbdb87a0799262eb9608f3f36674f093f554))
+
+
+* Merge pull request #18 from mixmaxhq/trey/fix-release ([40b50c4](https://github.com/mixmaxhq/publication-client/commit/40b50c4b571277f7c2e42a3981e2aa8dd8b3375d)), closes [#18](https://github.com/mixmaxhq/publication-client/issues/18)
+
 ## [2.5.0](https://github.com/mixmaxhq/publication-client/compare/v2.4.2...v2.5.0) (2021-01-15)
 
 
