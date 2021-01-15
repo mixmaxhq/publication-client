@@ -12,7 +12,7 @@
     "ci:commitlint": "commitlint-jenkins --pr-only",
     "prebuild": "rm -rf dist",
     "prepublishOnly": "npm run build && if [ \"$CI\" = '' ]; then node -p 'JSON.parse(process.env.npm_package_config_manualPublishMessage)'; exit 1; fi",
-    "semantic-release": "semantic-release",
+    "semantic-release": "SEMANTIC_COMMITLINT_SKIP=987b5c1 semantic-release",
     "lint": "eslint .",
     "test": "jest",
     "ci": "npm run lint && npm run test",
