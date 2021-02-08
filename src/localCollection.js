@@ -57,10 +57,7 @@ class LocalCollection extends EventEmitter {
    * @param {String[]} cleared The fields to remove from the document.
    */
   _onChanged(id, fields, cleared) {
-    var doc = this._docs[id];
-    if (!doc) {
-      throw new Error('Document has been changed without having been added!');
-    }
+    var doc = this._docs[id] || {};
 
     var expandedFields = expandKeys(fields);
     doc = this._docs[id] = _.omit(deepExtend(doc, expandedFields), cleared);
@@ -91,10 +88,8 @@ class LocalCollection extends EventEmitter {
    */
   _onRemoved(id) {
     var doc = this._docs[id];
-    if (!doc) {
-      if (this._supressRemovalWarnings) return;
-      throw new Error('Document has been removed without having been added!');
-    }
+    if (!doc) return;
+
     delete this._docs[id];
 
     this.emit('removed', doc);
