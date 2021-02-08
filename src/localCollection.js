@@ -15,17 +15,10 @@ import { expandKeys, deepExtend } from './utils';
 class LocalCollection extends EventEmitter {
   /**
    * Constructs a new LocalCollection.
-   *
-   * @param      {Object} [opts]
-   * @param      {bool}   [opts.supressRemovalWarnings]  If true, do not throw when we receive a
-   *   removed event and there is no corresponding document. This is useful for situations where
-   *   collections state is managed optimistically on the client rather than waiting for a server
-   *   response (e.g. calling model.destroy() from a backbone model).
    */
-  constructor({ supressRemovalWarnings } = {}) {
+  constructor() {
     super();
     this._docs = {};
-    this._supressRemovalWarnings = !!supressRemovalWarnings;
   }
 
   /**
