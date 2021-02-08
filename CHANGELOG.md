@@ -1,3 +1,37 @@
+### [2.4.2](https://github.com/mixmaxhq/publication-client/compare/v2.4.1...v2.4.2) (2020-10-06)
+
+
+### Bug Fixes
+
+* make reconnection less aggressive ([0ac50de](https://github.com/mixmaxhq/publication-client/commit/0ac50de51de47dd74db52382d4077c72a736a889))
+
+### [2.4.1](https://github.com/mixmaxhq/publication-client/compare/v2.4.0...v2.4.1) (2020-04-13)
+
+
+### Bug Fixes
+
+* emit reconnected event on _resetCollectionsAndConnect ([1df914c](https://github.com/mixmaxhq/publication-client/commit/1df914cade667c03eb300a02d6c96e3aa31a0d8c))
+
+## [2.4.0](https://github.com/mixmaxhq/publication-client/compare/v2.3.0...v2.4.0) (2020-03-31)
+
+
+### Features
+
+* enable reconnecting when paranoid mode is requested ([951aea9](https://github.com/mixmaxhq/publication-client/commit/951aea98f9b9a05f8e444d4273e7f2cf6db4c423))
+
+## [2.3.0](https://github.com/mixmaxhq/publication-client/compare/v2.2.0...v2.3.0) (2020-03-17)
+
+
+### Features
+
+* add paranoid mode to monitor and reconnect ([0702b31](https://github.com/mixmaxhq/publication-client/commit/0702b31572ecd48f9ecf311bb704f8ecf69733d1))
+* emit event when proactively reconnected ([ca8c63c](https://github.com/mixmaxhq/publication-client/commit/ca8c63c2c77fd7e22171f2efe843bed9a84411b3))
+
+
+### Bug Fixes
+
+* temporarily disable reconnecting while we track stats ([e265d1c](https://github.com/mixmaxhq/publication-client/commit/e265d1c4170763d382770d70ae3a01d1fa09fb8e))
+
 ## [2.2.0](https://github.com/mixmaxhq/publication-client/compare/v2.1.0...v2.2.0) (2020-03-10)
 
 

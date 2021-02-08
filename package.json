@@ -1,6 +1,6 @@
 {
   "name": "publication-client",
-  "version": "2.2.0",
+  "version": "2.4.2",
   "description": "A client for a publication-server",
   "main": "dist/browser/index.js",
   "files": [
@@ -13,8 +13,9 @@
     "prebuild": "rm -rf dist",
     "prepublishOnly": "npm run build && if [ \"$CI\" = '' ]; then node -p 'JSON.parse(process.env.npm_package_config_manualPublishMessage)'; exit 1; fi",
     "semantic-release": "semantic-release",
+    "lint": "eslint .",
     "test": "jest",
-    "ci": "npm run test",
+    "ci": "npm run lint && npm run test",
     "watch": "WATCH=true npm run build"
   },
   "repository": {
@@ -50,6 +51,7 @@
     "rollup": "^0.41.4",
     "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-node-resolve": "^2.0.0",
+    "rollup-watch": "^4.3.1",
     "semantic-release": "^17.3.8",
     "underscore": "^1.9.1"
   },

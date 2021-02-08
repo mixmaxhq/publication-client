@@ -9,7 +9,7 @@ import Subscription from './subscription';
 import { Promise } from 'es6-promise';
 
 /**
- * Returns the initial title case of the string, for example:
+ * Return the initial title case of the string, for example:
  *
  *  - initialTitleCase('hello') === 'Hello'
  *  - initialTitleCase('hello there') === 'Hello there'
@@ -27,7 +27,7 @@ function initialTitleCase(str) {
  */
 class PublicationClient extends EventEmitter {
   /**
-   * Creates a PublicationClient that connects to the publication provider at
+   * Create a PublicationClient that connects to the publication provider at
    * the given url with the given options.
    *
    * @param {String} url The hostname of the publication provider as a URL.
@@ -40,26 +40,67 @@ class PublicationClient extends EventEmitter {
   constructor(url, options) {
     super();
 
+    this._url = url;
+    this._options = Object.assign({}, options);
     this._subscriptions = {};
     this._nextSubscriptionId = 0;
     this._collections = {};
     this._isConnected = false;
 
-    this._client = new Primus(
+    // If we're told to be paranoid about connection monitoring, we'll set up
+    // our parameters here.
+    if (options.paranoid) {
+      // The last time we saw any data come through this client. If it's been
+      // too long, we'll proactively reconnect to make sure we're not just
+      // leaving a dead connection sitting there.
+      this._lastDataTimestamp = Date.now();
+
+      // Default the timeout for the last time we received data to 120 seconds.
+      this._lastDataTimeout = options.lastDataTimeout || 120 * 1000;
+
+      // Delete paranoia options so we don't pass them on to Primus.
+      delete options.paranoid;
+      delete options.lastDataTimeout;
+    }
+
+    this._client = this._initializeClient(url, options);
+    this._connect();
+  }
+
+  /**
+   * Set up a new Primus client with all the necessary event listeners.
+   *
+   * @param {String} url The hostname of the publication provider as a URL.
+   *    The provided protocol must be one of `https` or `http` (which
+   *    correspond to the client using `wss` or `ws).
+   * @param {Object} options Configuration options, these are passed through to
+   *    Primus so see for all options, please see:
+   *    https://github.com/primus/primus#connecting-from-the-browser.
+   * @returns {Primus} The initialized Primus client object.
+   */
+  _initializeClient(url, options) {
+    const client = new Primus(
       url,
       _.defaults(options, {
         strategy: ['online', 'disconnect'],
+        reconnect: {
+          min: 1000,
+          max: Infinity,
+          retries: 10,
+          factor: 2,
+        },
       })
     );
 
-    this._client.on('data', (message) => {
+    client.on('data', (message) => {
+      this._updateLastDataTimestamp();
       this._handleMessage(message);
     });
-    this._connect();
 
     // When we reconnect, we need to mark ourselves as not connected, and we
     // also need to re-subscribe to all of our publications.
-    this._client.on('reconnected', () => {
+    client.on('reconnected', () => {
+      this._updateLastDataTimestamp();
       // Now that we're reconnected again, drop all local collections. We have
       // to do this because we don't know what updates we may have missed while
       // we've been disconnected (i.e. we could have missed `removed` events).
@@ -70,25 +111,73 @@ class PublicationClient extends EventEmitter {
       // every collection, we use an private method to tell the collections to
       // drop all documents - this means pre-existing ReactiveQueries aren't
       // left dangling.
-      _.invoke(this._collections, '_clear');
-
-      this._connect();
-      _.each(this._subscriptions, (sub) => {
-        sub._reset();
-        sub._start();
-      });
+      this._resetCollectionsAndConnect();
     });
 
     // This event is purely a way for Primus to tell us that it's going to try
     // to reconnect.
-    this._client.on('reconnect', () => {
+    client.on('reconnect', () => {
+      this._updateLastDataTimestamp();
       if (this._isConnected) this.emit('disconnected');
       this._isConnected = false;
+    });
+
+    return client;
+  }
+
+  /**
+   * Refresh local collections, reconnect our websocket, and get our
+   * subscriptions up to date.
+   */
+  _resetCollectionsAndConnect() {
+    _.invoke(this._collections, '_clear');
+
+    this._connect();
+    _.each(this._subscriptions, (sub) => {
+      sub._reset();
+      sub._start();
+      sub.emit('reconnected');
     });
   }
 
   /**
-   * Handles the given message if it is of a known message type.
+   * Update the timestamp of the last time we know we received data from the
+   * server.
+   */
+  _updateLastDataTimestamp() {
+    this._lastDataTimestamp = Date.now();
+  }
+
+  /**
+   * Check whether we've received data in the timeout since the last data
+   * timestamp. If not, proactively reconnect.
+   *
+   * @param {string} reason Why this reconnect request was triggered.
+   */
+  reconnectIfIdle(reason) {
+    if (!this._lastDataTimeout) return; // Only run if in paranoid mode.
+    clearTimeout(this._idleTimer);
+    // If we haven't received any data since the last time we checked,
+    // force a reconnect.
+    if (Date.now() - this._lastDataTimestamp > this._lastDataTimeout) {
+      this._client.end();
+      this._client = this._initializeClient(this._url, this._options);
+      this._resetCollectionsAndConnect();
+      this.emit('proactivelyReconnected', reason);
+    }
+
+    // While we primarily rely on explicit calls to the reconnectIfIdle
+    // method to ensure we're checking, we'll also add a timer-based
+    // backup check so that a browser just sitting idle maintains its
+    // connection.
+    const boundReconnectFn = this.reconnectIfIdle.bind(this);
+    this._idleTimer = setTimeout(() => {
+      boundReconnectFn('Idle timeout');
+    }, this._lastDataTimeout * 3);
+  }
+
+  /**
+   * Handle the given message if it is of a known message type.
    * @param {Object} msg The message that we received from the publication
    *    provider.
    */
@@ -115,7 +204,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Returns a promise that will be resolved once the the publication provider
+   * Return a promise that will be resolved once the the publication provider
    * acknowledges to us that we are `connected`.
    *
    * @returns {Promise}
@@ -131,7 +220,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Tells the publication provider that we would like to connect.
+   * Tell the publication provider that we would like to connect.
    */
   _connect() {
     this._client.write({
@@ -141,8 +230,8 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Returns the collection with the given name. If no such collection exists,
-   * one is created and then returned.
+   * Return the collection with the given name. If no such collection exists,
+   * create one and return it.
    *
    * @param {String} name The name of the collection to return.
    * @param      {Object} [opts] Options to set on the collection if it's created.
@@ -161,7 +250,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Subscribes us to the publication with the given name, any other parameters
+   * Subscribe to the publication with the given name. Any other parameters
    * are passed as arguments to the publication.
    *
    * @param {String} name The publication to subscribe to.
@@ -186,7 +275,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Sends the given message to the publication provider.
+   * Send the given message to the publication provider.
    *
    * @param {Object} msg The message to send to the publication provider.
    */
@@ -195,7 +284,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Removes the subscription from the current session. This is called
+   * Remove the subscription from the current session. This is called
    * internally when a subscription is `stop()`ped.
    *
    * @param {String} subKey The subscription key that is unique to the
@@ -206,7 +295,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Adds the document with the given ID and fields to the given collection
+   * Add the document with the given ID and fields to the given collection
    * (all defined inside the message).
    *
    * @param {Object} message The message containing the document to add and the
@@ -222,7 +311,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Changes the document with the given ID in the given collection (all
+   * Change the document with the given ID in the given collection (all
    * defined inside the message).
    *
    * @param {Object} message The message containing the document to change and
@@ -239,7 +328,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Removes the document with the given ID from the given collection (all
+   * Remove the document with the given ID from the given collection (all
    * defined inside the message).
    *
    * @param {Object} message The message containing the document to remove and
@@ -254,7 +343,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Returns true if the client is currently connected to the server, false if
+   * Return true if the client is currently connected to the server, false if
    * it is not.
    *
    * @returns {Boolean} Whether the client is connected to the server or not.
@@ -264,7 +353,7 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
-   * Allows the user to close the connection.
+   * Allow the user to close the connection.
    */
   stop() {
     this._client.end();
