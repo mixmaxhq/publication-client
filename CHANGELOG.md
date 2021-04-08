@@ -1,3 +1,10 @@
+## [3.1.0](https://github.com/mixmaxhq/publication-client/compare/v3.0.0...v3.1.0) (2021-04-08)
+
+
+### Features
+
+* adding support for publications options ([99d9822](https://github.com/mixmaxhq/publication-client/commit/99d982287fd4ee0dc4495d453663a5fc942d08fd))
+
 ## [3.0.0](https://github.com/mixmaxhq/publication-client/compare/v2.5.0...v3.0.0) (2021-01-15)
 
 
