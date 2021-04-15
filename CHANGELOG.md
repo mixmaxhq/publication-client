@@ -1,3 +1,10 @@
+### [2.6.0](https://github.com/mixmaxhq/publication-client/compare/v2.4.3...v2.6.0) (2021-04-15)
+
+
+### Features
+
+* adding support for publications options through subscribeWithOptions method ([ee73715](https://github.com/mixmaxhq/publication-client/commit/ee737151a16704e1a197509875b2c6ab2f87b8a4))
+
 ### [2.4.2](https://github.com/mixmaxhq/publication-client/compare/v2.4.1...v2.4.2) (2020-10-06)
 
 
