@@ -262,12 +262,40 @@ class PublicationClient extends EventEmitter {
 
     // Hash the name and params to cache the subscription.
     const subscriptionKey = JSON.stringify(_.toArray(arguments));
-    var subscription = this._subscriptions[subscriptionKey];
+    let subscription = this._subscriptions[subscriptionKey];
     if (!subscription) {
       subscription = this._subscriptions[subscriptionKey] = new Subscription(
         String(id),
         name,
         params,
+        this
+      );
+    }
+    return subscription;
+  }
+
+  /**
+   * Subscribe to the publication with the given name. Any other parameters
+   * are passed as arguments to the publication.
+   *
+   * @param {String} name The publication to subscribe to.
+   * @param {Object} options containing optional parameters such as bootstrap and/or
+   * bootstrapAsync.
+   * @param {*[]} params (optional) Params to pass to the publication.
+   * @returns {Subscription} The subscription to the desired publication.
+   */
+  subscribeWithOptions(name, options, ...params) {
+    const id = this._nextSubscriptionId++;
+    const payload = [...params, options];
+
+    // Hash the name and params to cache the subscription including payload extended with options.
+    const subscriptionKey = JSON.stringify([name].concat(payload));
+    let subscription = this._subscriptions[subscriptionKey];
+    if (!subscription) {
+      subscription = this._subscriptions[subscriptionKey] = new Subscription(
+        String(id),
+        name,
+        payload,
         this
       );
     }

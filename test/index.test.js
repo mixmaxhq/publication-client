@@ -37,5 +37,25 @@ describe('PublicationClient', () => {
       expect(pub.emit).toHaveBeenCalledWith('proactivelyReconnected', 'test');
       jest.clearAllTimers();
     });
+
+    it('calls new method with correct parameters', () => {
+      const pub = new PublicationClient('https://127.0.0.1', {
+        lastDataTimeout: 1,
+        paranoid: true,
+      });
+      pub._lastDataTimestamp = 0;
+      pub.reconnectIfIdle('test');
+      const subscription = pub.subscribeWithOptions(
+        'test',
+        { bootstrap: false },
+        { key: 1 },
+        { key: 2 }
+      );
+      expect(pub._subscriptions).not.toBe({});
+      expect(subscription._params).toStrictEqual([{ key: 1 }, { key: 2 }, { bootstrap: false }]);
+      subscription.stop();
+      expect(pub._subscriptions).toStrictEqual({});
+      jest.clearAllTimers();
+    });
   });
 });
