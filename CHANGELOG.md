@@ -1,3 +1,11 @@
+### [2.6.1](https://github.com/mixmaxhq/publication-client/compare/v2.6.0...v2.6.1) (2021-04-22)
+
+
+### Bug Fixes
+
+* emit event on removal  ([7a7ebe0](https://github.com/mixmaxhq/publication-client/pull/24/commits/7a7ebe0e218d3a34ec4bd8160bf4336175ee3014))
+
+
 ### [2.6.0](https://github.com/mixmaxhq/publication-client/compare/v2.4.3...v2.6.0) (2021-04-15)
 
 
