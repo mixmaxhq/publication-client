@@ -80,9 +80,7 @@ class LocalCollection extends EventEmitter {
    * @param {String} id The ID of the document to remove.
    */
   _onRemoved(id) {
-    var doc = this._docs[id];
-    if (!doc) return;
-
+    var doc = this._docs[id] || { _id: id };
     delete this._docs[id];
 
     this.emit('removed', doc);
