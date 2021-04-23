@@ -1,3 +1,10 @@
+### [3.1.1](https://github.com/mixmaxhq/publication-client/compare/v3.1.0...v3.1.1) (2021-04-23)
+
+
+### Bug Fixes
+
+* emit event on removal regardless ([987afd3](https://github.com/mixmaxhq/publication-client/commit/987afd312ca9ed6caa3e7ad4285e71c78ecff68d))
+
 ## [3.1.0](https://github.com/mixmaxhq/publication-client/compare/v3.0.0...v3.1.0) (2021-04-08)
 
 
