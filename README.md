@@ -11,6 +11,8 @@ $ npm install publication-client
 
 ## Usage
 
+See [usage examples](https://github.com/mixmaxhq/publication-server/tree/master/examples).
+
 ### Requirements
 
 `publication-client` is an ES6 module, so you most likely want to use a bundler
