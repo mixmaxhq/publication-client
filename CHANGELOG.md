@@ -1,3 +1,15 @@
+## [3.2.0-beta.1](https://github.com/mixmaxhq/publication-client/compare/v3.1.1...v3.2.0-beta.1) (2021-11-02)
+
+
+### Features
+
+* update changes with v2.x ([7250fc8](https://github.com/mixmaxhq/publication-client/commit/7250fc80962093d3a33de6c4c4c1b47d2104a637))
+
+
+### Bug Fixes
+
+* push lockfile ([db43641](https://github.com/mixmaxhq/publication-client/commit/db43641777cc2a3dd34d79978cf8262c8f164670))
+
 ### [3.1.1](https://github.com/mixmaxhq/publication-client/compare/v3.1.0...v3.1.1) (2021-04-23)
 
 
