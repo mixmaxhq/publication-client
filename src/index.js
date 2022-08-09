@@ -1,12 +1,12 @@
 'use strict';
 
-import _ from 'underscore';
+import { Promise } from 'es6-promise';
 import EventEmitter from 'eventemitter3';
+import _ from 'underscore';
 
 import LocalCollection from './localCollection';
 import Primus from './primus';
 import Subscription from './subscription';
-import { Promise } from 'es6-promise';
 
 /**
  * Return the initial title case of the string, for example:
@@ -46,6 +46,13 @@ class PublicationClient extends EventEmitter {
     this._nextSubscriptionId = 0;
     this._collections = {};
     this._isConnected = false;
+
+    // If we subscribe via callbacks we will use these callbacks
+    this._onReconnectedEvent = undefined;
+    this._onAddedEvent = undefined;
+    this._onChangedEvent = undefined;
+    this._onRemovedEvent = undefined;
+    this._subscribedToCallbacks = false;
 
     // If we're told to be paranoid about connection monitoring, we'll set up
     // our parameters here.
@@ -130,6 +137,10 @@ class PublicationClient extends EventEmitter {
    * subscriptions up to date.
    */
   _resetCollectionsAndConnect() {
+    if (this._subscribedToCallbacks) {
+      this._onReconnectedEvent();
+    }
+
     _.invoke(this._collections, '_clear');
 
     this._connect();
@@ -242,11 +253,52 @@ class PublicationClient extends EventEmitter {
    * @returns {LocalCollection} The collection to return.
    */
   getCollection(name, options = {}) {
-    var collection = this._collections[name];
+    let collection = this._collections[name];
     if (!collection) {
       collection = this._collections[name] = new LocalCollection(options);
     }
     return collection;
+  }
+
+  /**
+   * Return if the collection exists (Means that the publication was created by backbone publication).
+   *
+   * @param {String} name The name of the collection to return.
+   * @param      {Object} [opts] Options to set on the collection if it's created.
+   * @returns {bool} If the collection exists.
+   */
+  isCollectionCreated(name) {
+    return !!this._collections[name];
+  }
+
+  /**
+   * Checks if the collection has been subscribed to (a Subscription has been created for it)
+   * via callbacks
+   *
+   * @param {String} collection The name of the collection name.
+   * @returns {Boolean} If we subscribed to the collection.
+   */
+  isCollectionSubscribedViaCallbacks(collection) {
+    return !!_.find(
+      _.keys(this._subscriptions),
+      (key) => key.startsWith(`["${collection}"`) && key.indexOf('subscribedViaCallbacks') > -1
+    );
+  }
+
+  /**
+   * Subscribe to the publication with the given name. Any other parameters
+   * are passed as arguments to the publication. Additional we are passing subscribedViaCallbacks
+   * to reflect that the publication is via callback
+   *
+   * @param {String} name The publication to subscribe to.
+   * @param {*[]} params (optional) Params to pass to the publication.
+   * @returns {Subscription} The subscription to the desired publication.
+   */
+  subscribeViaCallbacks(name, options) {
+    return this.subscribe(name, {
+      ...options,
+      subscribedViaCallbacks: true,
+    });
   }
 
   /**
@@ -303,6 +355,56 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
+   * Subscribe to the publication via callback parameters. If pressented expected to be called
+   * on receiving the events.
+   *
+   * @param {function} onReconnectedEvent The function that should be called when receiving reconnection.
+   * @param {function} onAddedEvent The function that should be called when receiving added updates.
+   * @param {function} onChangedEvent The function that should be called when receiving changed updates.
+   * @param {function} onRemovedEvent The function that should be called when receiving removed updates.
+   */
+  subscribeEventsToCallbacks(onReconnectedEvent, onAddedEvent, onChangedEvent, onRemovedEvent) {
+    this._onReconnectedEvent = onReconnectedEvent;
+    this._onAddedEvent = onAddedEvent;
+    this._onChangedEvent = onChangedEvent;
+    this._onRemovedEvent = onRemovedEvent;
+    this._subscribedToCallbacks = true;
+  }
+
+  /**
+   * Based on the name and params, gives the key of the subscription
+   *
+   * @param {String} name The publication to subscribe to.
+   * @param {*[]} params (optional) Params to pass to the publication.
+   * @returns {String} The subscription to the desired publication.
+   */
+  getSubscriptionKey() {
+    return JSON.stringify(_.toArray(arguments));
+  }
+  /**
+   * Unubscribe to the publication via callback parameters and for all the given hash name.
+   * @param {{
+   *  name: string - The publication to subscribe to.
+   *  params: *[] - (optional) Params to pass to the publication.
+   * }[]} keys
+   */
+  unsubscribeEventFromCallbacks(keys) {
+    _.map(keys, ({ name, options }) => {
+      const subscriptionKey = this.getSubscriptionKey(name, {
+        ...options,
+        subscribedViaCallbacks: true,
+      });
+      delete this._subscriptions[subscriptionKey];
+    });
+
+    this._onReconnectedEvent = undefined;
+    this._onAddedEvent = undefined;
+    this._onChangedEvent = undefined;
+    this._onRemovedEvent = undefined;
+    this._subscribedToCallbacks = false;
+  }
+
+  /**
    * Send the given message to the publication provider.
    *
    * @param {Object} msg The message to send to the publication provider.
@@ -330,11 +432,21 @@ class PublicationClient extends EventEmitter {
    *    collection to add it to.
    */
   _onAdded(message) {
-    var collectionName = message.collection;
-    var id = message.id;
-    var fields = message.fields;
+    const collectionName = message.collection;
+    const id = message.id;
+    const fields = message.fields;
 
-    var collection = this.getCollection(collectionName);
+    if (this.isCollectionSubscribedViaCallbacks(collectionName)) {
+      if (this._subscribedToCallbacks) {
+        this._onAddedEvent(collectionName, id, fields);
+      }
+      // check if backbone collection also listens for the publication
+      if (!this.isCollectionCreated(collectionName)) {
+        return;
+      }
+    }
+
+    const collection = this.getCollection(collectionName);
     collection._onAdded(id, fields);
   }
 
@@ -346,12 +458,22 @@ class PublicationClient extends EventEmitter {
    *    the collection that it exists inside of.
    */
   _onChanged(message) {
-    var collectionName = message.collection;
-    var id = message.id;
-    var fields = message.fields;
-    var cleared = message.cleared;
+    const collectionName = message.collection;
+    const id = message.id;
+    const fields = message.fields;
+    const cleared = message.cleared;
 
-    var collection = this.getCollection(collectionName);
+    if (this.isCollectionSubscribedViaCallbacks(collectionName)) {
+      if (this._subscribedToCallbacks) {
+        this._onChangedEvent(collectionName, id, fields, cleared);
+      }
+      // check if backbone collection also listens for the publication
+      if (!this.isCollectionCreated(collectionName)) {
+        return;
+      }
+    }
+
+    const collection = this.getCollection(collectionName);
     collection._onChanged(id, fields, cleared);
   }
 
@@ -363,10 +485,20 @@ class PublicationClient extends EventEmitter {
    *    the collection to remove it from.
    */
   _onRemoved(message) {
-    var collectionName = message.collection;
-    var id = message.id;
+    const collectionName = message.collection;
+    const id = message.id;
 
-    var collection = this.getCollection(collectionName);
+    if (this.isCollectionSubscribedViaCallbacks(collectionName)) {
+      if (this._subscribedToCallbacks) {
+        this._onRemovedEvent(collectionName, id);
+      }
+      // check if backbone collection also listens for the publication
+      if (!this.isCollectionCreated(collectionName)) {
+        return;
+      }
+    }
+
+    const collection = this.getCollection(collectionName);
     collection._onRemoved(id);
   }
 
