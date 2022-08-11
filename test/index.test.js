@@ -59,26 +59,50 @@ describe('PublicationClient', () => {
     });
   });
 
-  it('getSubscriptionById', () => {
-    const pub = new PublicationClient('https://127.0.0.1', {
-      lastDataTimeout: 1,
-      paranoid: true,
-    });
-    const subscriptionKey = {
-      name: 'orgs',
-      options: {
-        bootstrap: false,
-        expandMembers: true,
-      },
-    };
-    pub._nextSubscriptionId = 0;
-    for (let i = 0; i < 10; i++) {
-      pub.subscribe(`${subscriptionKey.name}-${i}`, subscriptionKey.options);
-    }
-    const subscriptionId = '5';
-    const subscription = pub.getSubscriptionById(subscriptionId);
+  describe('getSubscriptionById', () => {
+    it('return the subscription with the given key', () => {
+      const pub = new PublicationClient('https://127.0.0.1', {
+        lastDataTimeout: 1,
+        paranoid: true,
+      });
+      const subscriptionKey = {
+        name: 'orgs',
+        options: {
+          bootstrap: false,
+          expandMembers: true,
+        },
+      };
+      pub._nextSubscriptionId = 0;
+      for (let i = 0; i < 10; i++) {
+        pub.subscribe(`${subscriptionKey.name}-${i}`, subscriptionKey.options);
+      }
+      const subscriptionId = '5';
+      const subscription = pub.getSubscriptionById(subscriptionId);
 
-    expect(subscription._id).toEqual(subscriptionId);
-    expect(subscription._name).toEqual(`${subscriptionKey.name}-${subscriptionId}`);
+      expect(subscription._id).toEqual(subscriptionId);
+      expect(subscription._name).toEqual(`${subscriptionKey.name}-${subscriptionId}`);
+    });
+
+    it('return null if there is no subscription with the given id', () => {
+      const pub = new PublicationClient('https://127.0.0.1', {
+        lastDataTimeout: 1,
+        paranoid: true,
+      });
+      const subscriptionKey = {
+        name: 'orgs',
+        options: {
+          bootstrap: false,
+          expandMembers: true,
+        },
+      };
+      pub._nextSubscriptionId = 0;
+      for (let i = 0; i < 10; i++) {
+        pub.subscribe(`${subscriptionKey.name}-${i}`, subscriptionKey.options);
+      }
+      const subscriptionId = '11';
+      const subscription = pub.getSubscriptionById(subscriptionId);
+
+      expect(subscription).toEqual(null);
+    });
   });
 });
