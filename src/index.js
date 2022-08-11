@@ -323,6 +323,21 @@ class PublicationClient extends EventEmitter {
   }
 
   /**
+   * Return a subscription from the current session by the subscription id provided.
+   *
+   * @param {String} id The subscription id.
+   * @returns {Subscription} The subscription with the given id.
+   */
+  getSubscriptionById(id) {
+    for (const subscriptionKey in this._subscriptions) {
+      if (this._subscriptions[subscriptionKey]._id === id) {
+        return this._subscriptions[subscriptionKey];
+      }
+    }
+    return null;
+  }
+
+  /**
    * Add the document with the given ID and fields to the given collection
    * (all defined inside the message).
    *
