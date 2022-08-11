@@ -1,3 +1,10 @@
+### [3.2.1](https://github.com/mixmaxhq/publication-client/compare/v3.2.0...v3.2.1) (2022-08-11)
+
+
+### Bug Fixes
+
+* trigger publish ([ad5afc5](https://github.com/mixmaxhq/publication-client/commit/ad5afc5fc26ea08b0cd6bff930b1cc470a18479b))
+
 ## [3.2.0](https://github.com/mixmaxhq/publication-client/compare/v3.1.1...v3.2.0) (2021-11-02)
 
 
