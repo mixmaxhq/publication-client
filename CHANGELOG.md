@@ -1,3 +1,10 @@
+### [3.2.2](https://github.com/mixmaxhq/publication-client/compare/v3.2.1...v3.2.2) (2023-02-14)
+
+
+### Bug Fixes
+
+* **subscription:** fix onready handlers after reconnection ([4545d89](https://github.com/mixmaxhq/publication-client/commit/4545d891056514b0e9d059c0acc8dfeb59b74585))
+
 ### [3.2.1](https://github.com/mixmaxhq/publication-client/compare/v3.2.0...v3.2.1) (2022-08-11)
 
 
