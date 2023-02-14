@@ -48,14 +48,20 @@ class Subscription extends EventEmitter {
    * Prepare to start the subscription. May be called after starting the subscription without
    * having stopped the subscription using `stop`. This is useful if the connection was disconnected
    * and we are reconnecting.
+   *
+   * It's important not to reset `_whenReadyResolveFn` and `_whenReadyRejectFn` functions here, as
+   * we may have a pending `whenReady` called before the connection comes back. If we reset them,
+   * then `whenReady` won't resolve.
+   *
+   * E.g. we load a page and remove spinner when subscription is ready. If connection was lost,
+   * but then came back, we still want to process `ready` event and remove spinner.
+   * If we clear handlers here, `null` will be called and spinner will be left.
    */
   _reset() {
     this._isReady = false;
     this._isFailed = false;
     this._initializationError = null;
     this._isStopped = false;
-    this._whenReadyResolveFn = null;
-    this._whenReadyRejectFn = null;
   }
 
   /**
@@ -107,6 +113,10 @@ class Subscription extends EventEmitter {
     this.removeListener('ready', this._boundWhenReadyResolver);
     this.removeListener('nosub', this._boundWhenReadyRejecter);
 
+    // Reset ready functions, we unsubscribe from `ready` and `nosub` events
+    this._whenReadyResolveFn = null;
+    this._whenReadyRejectFn = null;
+
     this._connection._send({
       msg: 'unsub',
       id: this._id,
@@ -123,8 +133,6 @@ class Subscription extends EventEmitter {
    */
   whenReady() {
     return new Promise((resolve, reject) => {
-      this._whenReadyResolveFn = resolve;
-      this._whenReadyRejectFn = reject;
       if (this._isFailed) {
         // We automatically reject if we failed to initialize the subscription.
         reject(this._initializationError);
@@ -137,6 +145,8 @@ class Subscription extends EventEmitter {
         // `stop()` was called before the subscription was ready.
         reject(new Error('Subscription is already stopped'));
       } else {
+        this._whenReadyResolveFn = resolve;
+        this._whenReadyRejectFn = reject;
         this.once('ready', this._boundWhenReadyResolver);
         this.once('nosub', this._boundWhenReadyRejecter);
       }
@@ -149,6 +159,9 @@ class Subscription extends EventEmitter {
   _whenReadyResolver() {
     this.removeListener('nosub', this._boundWhenReadyRejecter);
     this._whenReadyResolveFn();
+    // Reset `whenReady` handlers
+    this._whenReadyResolveFn = null;
+    this._whenReadyRejectFn = null;
   }
 
   /**
@@ -157,6 +170,9 @@ class Subscription extends EventEmitter {
   _whenReadyRejecter(err) {
     this.removeListener('ready', this._boundWhenReadyResolver);
     this._whenReadyRejectFn(err);
+    // Reset `whenReady` handlers
+    this._whenReadyResolveFn = null;
+    this._whenReadyRejectFn = null;
   }
 
   /**
