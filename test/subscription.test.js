@@ -60,4 +60,15 @@ describe('Subscription', () => {
       sub.emit('ready');
     }).not.toThrow(TypeError);
   });
+
+  it('should not trigger error if `whenReady` is called multiple times', () => {
+    const sub = new Subscription('foo', 'fooSub', {}, conn);
+    // Calling more than once to subscribe multiple times to the `ready` event
+    sub.whenReady();
+    sub.whenReady();
+    // Triggering `ready` shouldn't cause errors
+    expect(() => {
+      sub.emit('ready');
+    }).not.toThrow(TypeError);
+  });
 });
