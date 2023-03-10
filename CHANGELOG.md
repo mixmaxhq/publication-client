@@ -1,3 +1,11 @@
+### [3.2.3](https://github.com/mixmaxhq/publication-client/compare/v3.2.2...v3.2.3) (2023-03-10)
+
+
+### Bug Fixes
+
+* **subscription:** improve tests for multiple `whenReady` ([e1a99db](https://github.com/mixmaxhq/publication-client/commit/e1a99dbbe68b5310992c3d6572a6e0936e2741f7))
+* fix regression for multiple `whenReady` calls ([6011557](https://github.com/mixmaxhq/publication-client/commit/601155739cd0042acbd5b43ca679c6adb5963719))
+
 ### [3.2.2](https://github.com/mixmaxhq/publication-client/compare/v3.2.1...v3.2.2) (2023-02-14)
 
 
