@@ -63,12 +63,26 @@ describe('Subscription', () => {
 
   it('should not trigger error if `whenReady` is called multiple times', () => {
     const sub = new Subscription('foo', 'fooSub', {}, conn);
-    // Calling more than once to subscribe multiple times to the `ready` event
-    sub.whenReady();
-    sub.whenReady();
+    // Spy on handler function that is used for `ready` event
+    jest.spyOn(sub, '_boundWhenReadyResolver');
+    // Mock `whenReady` resolve callbacks
+    const readyCallback1 = jest.fn();
+    const readyCallback2 = jest.fn();
+    // Call `whenReady` more than once to subscribe multiple times to the `ready` event
+    sub.whenReady().then(readyCallback1);
+    sub.whenReady().then(readyCallback2);
     // Triggering `ready` shouldn't cause errors
     expect(() => {
       sub.emit('ready');
     }).not.toThrow(TypeError);
+    // Verify that `ready` event handler is called the same number of times as `whenReady()`
+    expect(sub._boundWhenReadyResolver).toHaveBeenCalledTimes(2);
+    // Use `setTimeout` so that promises are resolved
+    setTimeout(() => {
+      // Each time in `whenReady` we return a new promise and rewrite `_whenReadyResolveFn` to the
+      // last `resolve` value, that's why only promise for last `whenReady` is expected to be called
+      expect(readyCallback1).not.toBeCalled();
+      expect(readyCallback2).toBeCalledTimes(1);
+    }, 0);
   });
 });
