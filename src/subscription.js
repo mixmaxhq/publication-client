@@ -159,9 +159,6 @@ class Subscription extends EventEmitter {
   _whenReadyResolver() {
     this.removeListener('nosub', this._boundWhenReadyRejecter);
     this._whenReadyResolveFn();
-    // Reset `whenReady` handlers
-    this._whenReadyResolveFn = null;
-    this._whenReadyRejectFn = null;
   }
 
   /**
@@ -170,9 +167,6 @@ class Subscription extends EventEmitter {
   _whenReadyRejecter(err) {
     this.removeListener('ready', this._boundWhenReadyResolver);
     this._whenReadyRejectFn(err);
-    // Reset `whenReady` handlers
-    this._whenReadyResolveFn = null;
-    this._whenReadyRejectFn = null;
   }
 
   /**
