@@ -1,6 +1,5 @@
 name: continuous-integration
-
-on:
+'on':
   push:
     branches:
       - alpha
@@ -9,12 +8,9 @@ on:
   pull_request:
     branches:
       - master
-
 jobs:
   default:
     uses: mixmaxhq/github-workflows/.github/workflows/npm_module.yml@main
     with:
       coverage_threshold: 20
-      node_version: 12.22.6
-      npm_version: 7.19.0
     secrets: inherit
