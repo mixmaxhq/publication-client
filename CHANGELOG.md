@@ -1,3 +1,10 @@
+### [3.2.4](https://github.com/mixmaxhq/publication-client/compare/v3.2.3...v3.2.4) (2023-08-11)
+
+
+### Bug Fixes
+
+* **deps:** update dependency node to v18 ([#45](https://github.com/mixmaxhq/publication-client/issues/45)) ([b92189c](https://github.com/mixmaxhq/publication-client/commit/b92189c48d7ae098869386e7e926f7e88c867dfb))
+
 ### [3.2.3](https://github.com/mixmaxhq/publication-client/compare/v3.2.2...v3.2.3) (2023-03-10)
 
 
