@@ -1,4 +1,5 @@
-const { isMatch } = require('../src/utils');
+import { describe, it, expect } from 'vitest';
+import { isMatch } from '../src/utils';
 
 describe('utils', () => {
   describe('isMatch', () => {

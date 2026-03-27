@@ -1,9 +1,10 @@
+import { describe, it, expect, vi } from 'vitest';
 import Subscription from '../src/subscription';
 
 describe('Subscription', () => {
   const conn = {
-    _send: jest.fn(),
-    on: jest.fn(),
+    _send: vi.fn(),
+    on: vi.fn(),
     _isConnected: true,
   };
 
@@ -27,7 +28,7 @@ describe('Subscription', () => {
   it('should call resolve handler on `ready` event', () => {
     const sub = new Subscription('foo', 'fooSub', {}, conn);
     // Spy on resolve handler function that is used for `ready` event
-    jest.spyOn(sub, '_boundWhenReadyResolver');
+    vi.spyOn(sub, '_boundWhenReadyResolver');
     // We subscribe to 'ready' event with `_boundWhenReadyResolver`
     sub.whenReady();
     // Emit `ready` event to verify that handler is called
@@ -38,7 +39,7 @@ describe('Subscription', () => {
   it('should call reject handler on `nosub` event', () => {
     const sub = new Subscription('foo', 'fooSub', {}, conn);
     // Spy on reject handler function that is used for `unsub` event
-    jest.spyOn(sub, '_boundWhenReadyRejecter');
+    vi.spyOn(sub, '_boundWhenReadyRejecter');
     // We subscribe to 'unsub' event with `_boundWhenReadyRejecter`
     sub.whenReady();
     // Emit 'nosub' event to verify that handler is called
@@ -61,13 +62,13 @@ describe('Subscription', () => {
     }).not.toThrow(TypeError);
   });
 
-  it('should not trigger error if `whenReady` is called multiple times', () => {
+  it('should not trigger error if `whenReady` is called multiple times', async () => {
     const sub = new Subscription('foo', 'fooSub', {}, conn);
     // Spy on handler function that is used for `ready` event
-    jest.spyOn(sub, '_boundWhenReadyResolver');
+    vi.spyOn(sub, '_boundWhenReadyResolver');
     // Mock `whenReady` resolve callbacks
-    const readyCallback1 = jest.fn();
-    const readyCallback2 = jest.fn();
+    const readyCallback1 = vi.fn();
+    const readyCallback2 = vi.fn();
     // Call `whenReady` more than once to subscribe multiple times to the `ready` event
     sub.whenReady().then(readyCallback1);
     sub.whenReady().then(readyCallback2);
@@ -77,12 +78,11 @@ describe('Subscription', () => {
     }).not.toThrow(TypeError);
     // Verify that `ready` event handler is called the same number of times as `whenReady()`
     expect(sub._boundWhenReadyResolver).toHaveBeenCalledTimes(2);
-    // Use `setTimeout` so that promises are resolved
-    setTimeout(() => {
-      // Each time in `whenReady` we return a new promise and rewrite `_whenReadyResolveFn` to the
-      // last `resolve` value, that's why only promise for last `whenReady` is expected to be called
-      expect(readyCallback1).not.toBeCalled();
-      expect(readyCallback2).toBeCalledTimes(1);
-    }, 0);
+    // Wait for promises to resolve before asserting
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    // Each time in `whenReady` we return a new promise and rewrite `_whenReadyResolveFn` to the
+    // last `resolve` value, that's why only promise for last `whenReady` is expected to be called
+    expect(readyCallback1).not.toBeCalled();
+    expect(readyCallback2).toBeCalledTimes(1);
   });
 });
