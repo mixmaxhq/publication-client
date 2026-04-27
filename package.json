@@ -14,7 +14,7 @@
     "prepublishOnly": "npm run build && if [ \"$CI\" = '' ]; then node -p 'JSON.parse(process.env.npm_package_config_manualPublishMessage)'; exit 1; fi",
     "semantic-release": "SEMANTIC_COMMITLINT_SKIP=987b5c1 semantic-release",
     "lint": "eslint .",
-    "test": "jest",
+    "test": "vitest run",
     "ci": "npm run lint && npm run test",
     "watch": "WATCH=true npm run build"
   },
@@ -38,22 +38,20 @@
     "@commitlint/config-conventional": "^8.3.4",
     "@mixmaxhq/commitlint-jenkins": "^1.6.0",
     "@mixmaxhq/git-hooks": "^1.0.1",
-    "@mixmaxhq/jest-coverage-config": "^2.0.1",
-    "@mixmaxhq/jest-junit-config": "^1.0.0",
     "@mixmaxhq/prettier-config": "^1.0.0",
     "@mixmaxhq/semantic-release-config": "^2.0.1",
     "cz-conventional-changelog": "^3.0.2",
     "eslint": "^6.8.0",
     "eslint-config-mixmax": "^4.6.0",
-    "jest": "^24.9.0",
-    "jest-junit": "^10.0.0",
     "prettier": "^1.19.1",
     "rollup": "^0.41.4",
     "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-watch": "^4.3.1",
     "semantic-release": "^17.3.8",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "vitest": "^1.6.1",
+    "ws": "^8.20.0"
   },
   "config": {
     "commitizen": {

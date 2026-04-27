@@ -6,16 +6,35 @@
       "extends": "mixmax/node"
     },
     {
-      "files": ["jest.config.js"],
-      "extends": "mixmax/node",
-      "parserOptions": {
-        "sourceType": "script"
+      "files": ["test/**/*.test.js"],
+      "globals": {
+        "globalThis": "readonly"
+      },
+      "rules": {
+        "jest/expect-expect": "off",
+        "jest/no-disabled-tests": "off",
+        "jest/no-conditional-expect": "off",
+        "jest/valid-title": "off",
+        "jest/no-jasmine-globals": "off",
+        "jest/valid-expect": "off",
+        "jest/valid-expect-in-promise": "off",
+        "jest/no-alias-methods": "off",
+        "jest/no-focused-tests": "off",
+        "jest/no-identical-title": "off",
+        "jest/no-jest-import": "off",
+        "jest/no-test-prefixes": "off",
+        "jest/prefer-to-have-length": "off",
+        "jest/prefer-to-be-null": "off",
+        "jest/prefer-to-be-undefined": "off"
       }
     }
   ],
   "settings": {
     "react": {
       "version": "latest"
+    },
+    "jest": {
+      "version": 29
     }
   }
 }

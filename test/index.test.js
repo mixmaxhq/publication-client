@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from 'vitest';
 import PublicationClient from '../src/index.js';
 
 describe('PublicationClient', () => {
@@ -8,10 +9,13 @@ describe('PublicationClient', () => {
 
   describe('reconnectIfIdle', () => {
     it('short-circuits when not in paranoid mode', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
+      const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
       const pub = new PublicationClient('https://127.0.0.1', {});
       pub.reconnectIfIdle('test');
-      expect(clearTimeout).not.toHaveBeenCalled();
+      expect(clearTimeoutSpy).not.toHaveBeenCalled();
+      clearTimeoutSpy.mockRestore();
+      vi.useRealTimers();
     });
 
     it.skip('reconnects if the connection is idle', () => {
@@ -19,11 +23,11 @@ describe('PublicationClient', () => {
         lastDataTimeout: 1,
         paranoid: true,
       });
-      jest.spyOn(pub, '_resetCollectionsAndConnect');
+      vi.spyOn(pub, '_resetCollectionsAndConnect');
       pub._lastDataTimestamp = 0;
       pub.reconnectIfIdle('test');
       expect(pub._resetCollectionsAndConnect).toHaveBeenCalled();
-      jest.clearAllTimers();
+      vi.clearAllTimers();
     });
 
     it('emits an event when it reconnects', () => {
@@ -31,11 +35,11 @@ describe('PublicationClient', () => {
         lastDataTimeout: 1,
         paranoid: true,
       });
-      jest.spyOn(pub, 'emit');
+      vi.spyOn(pub, 'emit');
       pub._lastDataTimestamp = 0;
       pub.reconnectIfIdle('test');
       expect(pub.emit).toHaveBeenCalledWith('proactivelyReconnected', 'test');
-      jest.clearAllTimers();
+      vi.clearAllTimers();
     });
 
     it('calls new method with correct parameters', () => {
@@ -55,7 +59,7 @@ describe('PublicationClient', () => {
       expect(subscription._params).toStrictEqual([{ key: 1 }, { key: 2 }, { bootstrap: false }]);
       subscription.stop();
       expect(pub._subscriptions).toStrictEqual({});
-      jest.clearAllTimers();
+      vi.clearAllTimers();
     });
   });
 
